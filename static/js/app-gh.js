@@ -3,7 +3,6 @@ function buildMetadata(sample) {
 
   // Build the metadata panel
   // Use `d3.json` to fetch the metadata for a sample
-  //var url = "/metadata/" + sample;
   d3.json("data/samples.json").then(function(data){
 
     // Use d3 to select the panel with id of `#sample-metadata`
@@ -17,26 +16,25 @@ function buildMetadata(sample) {
     var filteredArray = filteredMetadata[0]
 
     // Use `Object.entries` to add each key and value pair to the panel
-    // Inside the loop, use d3 to append new tags for each key-value
+    // Inside the loop, append new info for each key-value
     // in the metadata.
     Object.entries(filteredArray).forEach(([key, value]) => {
       var row = sample_metadata.append("p");
       row.text(`${key}: ${value}`);
 
-    })  //ends the Object.entries(sample).forEach...
-  }) //ends the section for d3.json(url.then(function(data) 
+    })  //ends the Object.entries(filteredArray).forEach...
+  }) //ends the section for d3.json
 };  //ends the function buildMetadata(sample)
 
 function buildBarChart(sample) {
    // Use `d3.json` to fetch the sample data for the bar chart
-   //var url = `/samples/${sample}`;
    d3.json("data/samples.json").then(function(data) { 
-    //console.log(data); 
+      //console.log(data); 
     var samples = data.samples
     var filterSamples = samples.filter(item => item.id == sample)
-    //console.log(filterSamples);
+      //console.log(filterSamples);
     var ybar = filterSamples[0].otu_ids;
-    //console.log(ybar);
+      //console.log(ybar);
     var xbar = filterSamples[0].sample_values;
     var barHover = filterSamples[0].otu_labels;
 
@@ -63,14 +61,13 @@ function buildBarChart(sample) {
         
         // Render the plot to the div tag with id "plot"
         Plotly.newPlot("plot", data, layout);
-});  //ends the section for d3.json(url.then(function(data) 
+});  //ends the section for d3.json
 } //ends the function buildBarChart(sample)
 
 // Build the gauge chart
 function buildGaugeChart(sample) {
   
    // Use `d3.json` to fetch the metadata
-   //var url = `/metadata/${sample}`;
    d3.json("data/samples.json").then(function(data) {
       //console.log(data);  - used to make sure I was getting the data I wanted
     var metadata = data.metadata;
@@ -118,14 +115,13 @@ function buildGaugeChart(sample) {
   var layout = { width: 600, height: 500, margin: { t: 0, b: 0 } };
   //plot
   Plotly.newPlot("gauge", data, layout);
-  });  // ends d3.json(url).then(function(data)
+  });  // ends d3.json
 }  //ends the function buildGaugeChart(sample)
 
 // Build the bubble chart
 function buildCharts(sample) {
 
-  // Use `d3.json` to fetch the sample data for the plots
-  //var url = `/samples/${sample}`;
+  // Use `d3.json` to fetch the sample data for the bubble chart
   d3.json("data/samples.json").then(function(data) {
 
     var samples = data.samples
@@ -159,7 +155,7 @@ function buildCharts(sample) {
 
     Plotly.newPlot('bubble', data, layout);
 
-  });  //ends the d3.json(url).then(function(data)
+  });  //ends the d3.json
 }  //ends the function buildCharts(sample)
 
 function init() {
@@ -174,7 +170,7 @@ function init() {
         .append("option")
         .text(sample)
         .property("value", sample);
-    }); //ends the sampleNames.forEach...
+    }); //ends the names.forEach...
 
     // Use the first sample from the list to build the initial plots
     const firstSample = names[0];
@@ -182,7 +178,7 @@ function init() {
     buildGaugeChart(firstSample);
     buildCharts(firstSample);
     buildMetadata(firstSample);
-  });  //ends the d3.json("/names").then((sampleNames)
+  });  //ends the d3.json
 };  //ends the function(init()
 
 function optionChanged(newSample) {
