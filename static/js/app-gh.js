@@ -1,50 +1,44 @@
-d3.json("data/data.json").then((data) => {
-    console.log(data);
-    function data(sample) {
-      console.log(sample.names);
-    }
 
 function buildMetadata(sample) {
-
-  // For github page:
 
   // Build the metadata panel
   // Use `d3.json` to fetch the metadata for a sample
   //var url = "/metadata/" + sample;
-  d3.json("data/data.json").then(function(sample){
-  var sample = data;
-  var sample_metadata = selector.data(data.metadata)
-      .enter()
-      .append("option")
-      .text(d => d)
-      .property(d => d);
+  d3.json("data/samples.json").then(function(data){
 
     // Use d3 to select the panel with id of `#sample-metadata`
     var sample_metadata = d3.select("#sample-metadata");
-    console.log(sample_metadata);
 
-    
     // Use `.html("")` to clear any existing metadata
     sample_metadata.html("");
+
+    var metadata = data.metadata;
+    var filteredMetadata = metadata.filter(item => item.id == sample)
+    var filteredArray = filteredMetadata[0]
 
     // Use `Object.entries` to add each key and value pair to the panel
     // Inside the loop, use d3 to append new tags for each key-value
     // in the metadata.
-    Object.entries(sample).forEach(([key, value]) => {
+    Object.entries(filteredArray).forEach(([key, value]) => {
       var row = sample_metadata.append("p");
       row.text(`${key}: ${value}`);
 
     })  //ends the Object.entries(sample).forEach...
-  //}) //ends the section for d3.json(url.then(function(data) 
+  }) //ends the section for d3.json(url.then(function(data) 
 };  //ends the function buildMetadata(sample)
 
 function buildBarChart(sample) {
-    // Use `d3.json` to fetch the sample data for the bar chart
-    //var url = `/samples/${sample}`;
-    //d3.json(url).then(function(data) { 
-    var ybar = data.samples.find(x => x.id === sample).otu_ids;
-    var xbar = data.samples[0].sample_values;
-    var barHover = data.samples[0].otu_labels;
+   // Use `d3.json` to fetch the sample data for the bar chart
+   //var url = `/samples/${sample}`;
+   d3.json("data/samples.json").then(function(data) { 
+    //console.log(data); 
+    var samples = data.samples
+    var filterSamples = samples.filter(item => item.id == sample)
+    //console.log(filterSamples);
+    var ybar = filterSamples[0].otu_ids;
+    //console.log(ybar);
+    var xbar = filterSamples[0].sample_values;
+    var barHover = filterSamples[0].otu_labels;
 
       // Build a Bar Chart using the sample data
       var trace1 = {
@@ -69,17 +63,20 @@ function buildBarChart(sample) {
         
         // Render the plot to the div tag with id "plot"
         Plotly.newPlot("plot", data, layout);
-//});  //ends the section for d3.json(url.then(function(data) 
+});  //ends the section for d3.json(url.then(function(data) 
 } //ends the function buildBarChart(sample)
 
 // Build the gauge chart
 function buildGaugeChart(sample) {
   
-    // Use `d3.json` to fetch the metadata
-    //var url = `/metadata/${sample}`;
-    //d3.json(url).then(function(data) {
+   // Use `d3.json` to fetch the metadata
+   //var url = `/metadata/${sample}`;
+   d3.json("data/samples.json").then(function(data) {
       //console.log(data);  - used to make sure I was getting the data I wanted
-    var freqValues = data.metadata.wfreq;
+    var metadata = data.metadata;
+    var filteredMetadata = metadata.filter(item => item.id == sample)
+    var filteredArray = filteredMetadata[0]
+    var freqValues = filteredArray.wfreq;
       //console.log(freqValues);  used to check the value
     var data = [
       {
@@ -121,21 +118,27 @@ function buildGaugeChart(sample) {
   var layout = { width: 600, height: 500, margin: { t: 0, b: 0 } };
   //plot
   Plotly.newPlot("gauge", data, layout);
-  //});  // ends d3.json(url).then(function(data)
+  });  // ends d3.json(url).then(function(data)
 }  //ends the function buildGaugeChart(sample)
 
+// Build the bubble chart
 function buildCharts(sample) {
 
   // Use `d3.json` to fetch the sample data for the plots
   //var url = `/samples/${sample}`;
-  //d3.json(url).then(function(data) {
+  d3.json("data/samples.json").then(function(data) {
+
+    var samples = data.samples
+    var filterSamples = samples.filter(item => item.id == sample)
+      //console.log(filterSamples);
+    var ybar = filterSamples[0].otu_ids;
 
     // Build a Bubble Chart using the sample data
-    var xValues = data.otu_ids;
-    var yValues = data.sample_values;
-    var tValues = data.otu_labels;
-    var mSize = data.sample_values;
-    var mClrs = data.otu_ids;
+    var xValues = filterSamples[0].otu_ids;
+    var yValues = filterSamples[0].sample_values;
+    var tValues = filterSamples[0].otu_labels;
+    var mSize = filterSamples[0].sample_values;
+    var mClrs = filterSamples[0].otu_ids;
 
     var trace_bubble = {
       x: xValues,
@@ -156,41 +159,30 @@ function buildCharts(sample) {
 
     Plotly.newPlot('bubble', data, layout);
 
-  //});  //ends the d3.json(url).then(function(data)
+  });  //ends the d3.json(url).then(function(data)
 }  //ends the function buildCharts(sample)
 
 function init() {
   // Grab a reference to the dropdown select element
-  var selector = d3.select("#selDataset")
-  sampleNames = data.names
+  var selector = d3.select("#selDataset");
 
   // Use the list of sample names to populate the select options
-
-  sampleNames.forEach((sample) => {
-  selector
-      .data(data.names)
-      .enter()
-      .append("option")
-      .text(d => d)
-      .property(d => d);
-  }); //ends the sampleNames.forEach...    
-  
-  //d3.json("/names").then((sampleNames) => {
-  //   
-  //     selector
-  //       .append("option")
-  //       .text(sample)
-  //       .property("value", sample);
-  
+  d3.json("data/samples.json").then((sampleNames) => {
+    var names = sampleNames.names;
+    names.forEach((sample) => {
+      selector
+        .append("option")
+        .text(sample)
+        .property("value", sample);
+    }); //ends the sampleNames.forEach...
 
     // Use the first sample from the list to build the initial plots
-    const firstSample = data.names[0];
-    console.log(firstSample);
+    const firstSample = names[0];
     buildBarChart(firstSample);
     buildGaugeChart(firstSample);
     buildCharts(firstSample);
     buildMetadata(firstSample);
-  //});  //ends the .then((sampleNames)
+  });  //ends the d3.json("/names").then((sampleNames)
 };  //ends the function(init()
 
 function optionChanged(newSample) {
@@ -203,4 +195,4 @@ function optionChanged(newSample) {
 }; //ends the function(optionChanged(newSample)
 
 // Initialize the dashboard
-init();    
+init();
